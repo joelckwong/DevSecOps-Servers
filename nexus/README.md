@@ -6,7 +6,7 @@ sudo mkdir -p /data/nexus_data
 
 sudo chown 200:200 /data/nexus_data
 
-docker-compose up -d
+docker compose up -d
 
 https://FQDN
 
