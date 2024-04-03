@@ -8,7 +8,7 @@ sudo chown 1000:1000 /data/jenkins_home
 
 sudo chown 999:9999 /data/mariadb
 
-docker-compose up -d
+docker compose up -d
 
 https://FQDN
 
