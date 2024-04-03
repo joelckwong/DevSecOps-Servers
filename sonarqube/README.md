@@ -12,7 +12,7 @@ sudo chown 1000:1000 /data/sonarqube_data /data/sonarqube_logs
 
 sudo chown 999:999 /data/postgresql_data
 
-docker-compose up -d
+docker compose up -d
 
 https://FQDN
 
