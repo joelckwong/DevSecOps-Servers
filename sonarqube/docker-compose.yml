@@ -21,7 +21,7 @@ services:
         max-file: 3
 
   postgres:
-    image: postgres:15
+    image: postgres:17
     container_name: postgres
     environment:
       - POSTGRES_USER=sonar
