@@ -1,6 +1,6 @@
 We will install Sonarqube 10.x LTS
 
-add "vm.max_map_count=262144" to /etc/sysctl.conf
+echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
 
 sudo sysctl -p /etc/sysctl.conf
 
