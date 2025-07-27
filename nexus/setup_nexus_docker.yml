@@ -1,12 +1,11 @@
 ---
-- name: Setup Jenkins with Docker on CentOS/RHEL
+- name: Setup Nexus with Docker on CentOS/RHEL
   hosts: all
   become: true
   vars:
     docker_repo_url: https://download.docker.com/linux/centos/docker-ce.repo
     git_repo: https://github.com/joelckwong/DevSecOps-Servers.git
-    jenkins_dir: /data/jenkins_home
-    mariadb_dir: /data/mariadb
+    nexus_dir: /data/nexus_data
 
   tasks:
     - name: Ensure umask is set to 022
@@ -53,33 +52,25 @@
         dest: ~/DevSecOps-Servers
         version: master
 
-    - name: Create Jenkins and MariaDB data directories
+    - name: Create Nexus data directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         mode: '0755'
       loop:
-        - "{{ jenkins_dir }}"
-        - "{{ mariadb_dir }}"
+        - "{{ nexus_dir }}"
 
-    - name: Set ownership for Jenkins directory
+    - name: Set ownership for Nexus directory
       ansible.builtin.file:
-        path: "{{ jenkins_dir }}"
-        owner: 1000
-        group: 1000
+        path: "{{ nexus_dir }}"
+        owner: 200
+        group: 200
         recurse: yes
 
-    - name: Set ownership for MariaDB directory
-      ansible.builtin.file:
-        path: "{{ mariadb_dir }}"
-        owner: 999
-        group: 9999
-        recurse: yes
-
-    - name: Run docker-compose in Jenkins directory
+    - name: Run docker-compose in Nexus directory
       ansible.builtin.shell: docker compose up -d
       args:
-        chdir: ~/DevSecOps-Servers/jenkins
+        chdir: ~/DevSecOps-Servers/nexus
 
     - name: Open port 443 permanently
       ansible.builtin.command: firewall-cmd --permanent --add-port=443/tcp
@@ -97,13 +88,13 @@
 
     - name: Pause for 1 minutes to app start
       ansible.builtin.pause:
-        minutes: 1
+        minutes: 1 
 
-    - name: Display Jenkins initial admin password
-      ansible.builtin.command: docker exec -i jenkins cat /var/jenkins_home/secrets/initialAdminPassword
-      register: jenkins_password
+    - name: Display Nexus initial admin password
+      ansible.builtin.command: docker exec -i nexus cat /nexus-data/admin.password
+      register: nexus_password
       changed_when: false
 
-    - name: Show Jenkins admin password
+    - name: Show nexus admin password
       ansible.builtin.debug:
-        var: jenkins_password.stdout
+        var: nexus_password.stdout

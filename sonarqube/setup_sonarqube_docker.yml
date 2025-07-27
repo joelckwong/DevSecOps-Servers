@@ -5,8 +5,7 @@
   vars:
     docker_repo_url: https://download.docker.com/linux/centos/docker-ce.repo
     git_repo: https://github.com/joelckwong/DevSecOps-Servers.git
-    jenkins_dir: /data/jenkins_home
-    mariadb_dir: /data/mariadb
+    sysctl_conf: "/etc/sysctl.conf"
 
   tasks:
     - name: Ensure umask is set to 022
@@ -47,39 +46,43 @@
         groups: docker
         append: yes
 
+    - name: Set vm.max_map_count
+      ansible.builtin.sysctl:
+        name: vm.max_map_count
+        value: '262144'
+        state: present
+        reload: yes
+
     - name: Clone Git repository
       ansible.builtin.git:
         repo: "{{ git_repo }}"
         dest: ~/DevSecOps-Servers
         version: master
 
-    - name: Create Jenkins and MariaDB data directories
+    - name: Create SonarQube data directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         mode: '0755'
       loop:
-        - "{{ jenkins_dir }}"
-        - "{{ mariadb_dir }}"
+        - /data/sonarqube_data
+        - /data/sonarqube_logs
+        - /data/postgresql_data
 
-    - name: Set ownership for Jenkins directory
+    - name: Set ownership for sonarqube_data and logs
       ansible.builtin.file:
-        path: "{{ jenkins_dir }}"
-        owner: 1000
-        group: 1000
-        recurse: yes
+        path: "{{ item.path }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+      loop:
+        - { path: /data/sonarqube_data, owner: '1000', group: '1000' }
+        - { path: /data/sonarqube_logs, owner: '1000', group: '1000' }
+        - { path: /data/postgresql_data, owner: '999', group: '999' }
 
-    - name: Set ownership for MariaDB directory
-      ansible.builtin.file:
-        path: "{{ mariadb_dir }}"
-        owner: 999
-        group: 9999
-        recurse: yes
-
-    - name: Run docker-compose in Jenkins directory
+    - name: Run docker-compose in Sonarqube directory
       ansible.builtin.shell: docker compose up -d
       args:
-        chdir: ~/DevSecOps-Servers/jenkins
+        chdir: ~/DevSecOps-Servers/sonarqube
 
     - name: Open port 443 permanently
       ansible.builtin.command: firewall-cmd --permanent --add-port=443/tcp
@@ -95,15 +98,12 @@
       ansible.builtin.debug:
         var: firewall_ports.stdout
 
-    - name: Pause for 1 minutes to app start
+    - name: Pause for 3 minutes to app start
       ansible.builtin.pause:
-        minutes: 1
+        minutes: 3
 
-    - name: Display Jenkins initial admin password
-      ansible.builtin.command: docker exec -i jenkins cat /var/jenkins_home/secrets/initialAdminPassword
-      register: jenkins_password
-      changed_when: false
-
-    - name: Show Jenkins admin password
-      ansible.builtin.debug:
-        var: jenkins_password.stdout
+    - name: Reboot system
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible after SonarQube setup."
+        pre_reboot_delay: 5
+        reboot_timeout: 600
