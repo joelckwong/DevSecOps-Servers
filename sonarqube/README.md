@@ -1,4 +1,4 @@
-We will install Sonarqube 10.x LTS
+We will install Sonarqube v25.x LTS
 
 In this example, we are installing on RHEL8 VM. I've already created the self signed certs using the command below: create self-signed cert with "openssl req -new -x509 -newkey rsa:4096 -nodes -out nginx/nginx-selfsigned.crt -keyout nginx/nginx-selfsigned.key -days 3650 -subj "/C=US/ST=Massachusetts/L=Boston/O=example/OU=example/CN=example"
 
@@ -20,6 +20,10 @@ sudo mkdir -p /data/sonarqube_data /data/sonarqube_logs /data/postgresql_data
 sudo chown 1000:1000 /data/sonarqube_data /data/sonarqube_logs
 sudo chown 999:999 /data/postgresql_data
 docker compose up -d
+sudo firewall-cmd --permanent --add-port=443/tcp
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-ports
+sudo init 6
 ```
 In the web browser go to https://FQDN
-login as admin and use the password above
+login as admin/admin
