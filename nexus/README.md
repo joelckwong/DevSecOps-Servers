@@ -21,5 +21,5 @@ sudo firewall-cmd --reload
 sudo firewall-cmd --list-ports
 docker exec -it nexus cat /nexus-data/admin.password
 ``
-https://FQDN
+In the web browser go to https://FQDN
 login as admin and use the password above
