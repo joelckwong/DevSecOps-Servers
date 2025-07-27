@@ -79,6 +79,11 @@
         - { path: /data/sonarqube_logs, owner: '1000', group: '1000' }
         - { path: /data/postgresql_data, owner: '999', group: '999' }
 
+    - name: Change file ownership, group and permissions
+      ansible.builtin.file:
+        path: /root/DevSecOps-Servers/sonarqube/sonar-cxx-plugin-2.1.1.488.jar
+        mode: '0644'
+
     - name: Run docker-compose in Sonarqube directory
       ansible.builtin.shell: docker compose up -d
       args:
