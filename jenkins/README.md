@@ -24,5 +24,4 @@ sudo firewall-cmd --reload
 sudo firewall-cmd --list-ports
 docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 ```
-https://FQDN
-login as admin and use the password above
+In a web browser go to https://FQDN and use the password above
