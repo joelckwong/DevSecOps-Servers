@@ -9,7 +9,6 @@
 
   tasks:
     - name: Ensure umask is set to 022
-      ansible.builtin.lineinfile:
       ansible.builtin.replace:
         path: /etc/profile
         regexp: '077'
