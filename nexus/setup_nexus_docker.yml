@@ -9,10 +9,10 @@
 
   tasks:
     - name: Ensure umask is set to 022
-      ansible.builtin.lineinfile:
+      ansible.builtin.replace:
         path: /etc/profile
-        line: "umask 022"
-        state: present
+        regexp: '077'
+        replace: '022'
 
     - name: Stop and disable fapolicyd
       ansible.builtin.systemd:
