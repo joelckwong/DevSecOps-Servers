@@ -1,0 +1,113 @@
+---
+- name: Setup Jenkins with Docker on CentOS/RHEL
+  hosts: all
+  become: true
+  vars:
+    docker_repo_url: https://download.docker.com/linux/centos/docker-ce.repo
+    git_repo: https://github.com/joelckwong/DevSecOps-Servers.git
+    jenkins_dir: /data/jenkins_home
+    mariadb_dir: /data/mariadb
+
+  tasks:
+    - name: Ensure umask is set to 022
+      ansible.builtin.lineinfile:
+        path: /etc/profile
+        line: "umask 022"
+        state: present
+
+    - name: Stop and disable fapolicyd
+      ansible.builtin.systemd:
+        name: fapolicyd
+        state: stopped
+        enabled: false
+
+    - name: Add Docker CE repository
+      ansible.builtin.command:
+        cmd: yum-config-manager --add-repo {{ docker_repo_url }}
+      args:
+        creates: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Enable container-tools module
+      ansible.builtin.dnf:
+        name: "@container-tools"
+        state: present
+
+    - name: Install Docker CE
+      ansible.builtin.dnf:
+        name: docker-ce
+        state: present
+        allow_downgrade: yes
+        allowerasing: yes
+
+    - name: Enable and start Docker service
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Clone Git repository
+      ansible.builtin.git:
+        repo: "{{ git_repo }}"
+        dest: ~/DevSecOps-Servers
+        version: master
+
+    - name: Create Jenkins and MariaDB data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ jenkins_dir }}"
+        - "{{ mariadb_dir }}"
+
+    - name: Set ownership for Jenkins directory
+      ansible.builtin.file:
+        path: "{{ jenkins_dir }}"
+        owner: 1000
+        group: 1000
+        recurse: yes
+
+    - name: Set ownership for MariaDB directory
+      ansible.builtin.file:
+        path: "{{ mariadb_dir }}"
+        owner: 999
+        group: 9999
+        recurse: yes
+
+    - name: Run docker-compose in Jenkins directory
+      ansible.builtin.shell: docker compose up -d
+      args:
+        chdir: ~/DevSecOps-Servers/jenkins
+
+    - name: Open port 443 permanently
+      ansible.posix.firewalld:
+        port: 443/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+
+    - name: Reload firewalld
+      ansible.builtin.command: firewall-cmd --reload
+
+    - name: List open ports
+      ansible.builtin.command: firewall-cmd --list-ports
+      register: firewall_ports
+
+    - name: Show open ports
+      ansible.builtin.debug:
+        var: firewall_ports.stdout
+
+    - name: Display Jenkins initial admin password
+      ansible.builtin.command: docker exec -i jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+      register: jenkins_password
+      changed_when: false
+
+    - name: Show Jenkins admin password
+      ansible.builtin.debug:
+        var: jenkins_password.stdout
