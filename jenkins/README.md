@@ -12,6 +12,7 @@ newgrp docker
 git clone https://github.com/joelckwong/DevSecOps-Servers.git
 cd DevSecOps-Servers/jenkins
 sudo mkdir -p /data/jenkins_home /data/mariadb
+sudo chmod -R 755 /data
 sudo chown 1000:1000 /data/jenkins_home
 sudo chown 999:9999 /data/mariadb
 docker compose up -d
