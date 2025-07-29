@@ -1,6 +1,6 @@
 We will install Gitlab CE
 
-In this example, we are installing on RHEL8 VM. I've already created the self signed certs using the command below: create self-signed cert with "openssl req -new -x509 -newkey rsa:4096 -nodes -out ssl/nginx-selfsigned.crt -keyout ssl/nginx-selfsigned.key -days 3650 -subj "/C=US/ST=Massachusetts/L=Boston/O=example/OU=example/CN=example"
+In this example, we are installing on RHEL8 VM. I've already created the self signed certs using the command below: create self-signed cert with "openssl req -new -x509 -newkey rsa:4096 -nodes -out ssl/server-cert.pem -keyout ssl/server-key.pem -days 3650 -subj "/C=US/ST=Massachusetts/L=Boston/O=example/OU=example/CN=example"
 
 Edit docker-compose and put the FQDN of the server in place of my.gitlab
 ```
