@@ -15,12 +15,11 @@ sudo usermod -aG docker $LOGNAME
 newgrp docker
 git clone https://github.com/joelckwong/DevSecOps-Servers.git
 cd DevSecOps-Servers/gitlab
-sudo mkdir -p /data//data/gitlab/config /data/gitlab/logs /data/gitlab/data /data/gitlab-runner
+sudo mkdir -p /data/gitlab/config /data/gitlab/logs /data/gitlab/data /data/gitlab-runner
 docker compose up -d
 sudo firewall-cmd --permanent --add-port=443/tcp
 sudo firewall-cmd --reload
 sudo firewall-cmd --list-ports
-sudo init 6
 ```
 In the web browser go to https://FQDN
 login as admin/admin
