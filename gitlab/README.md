@@ -4,12 +4,11 @@ In this example, we are installing on RHEL8 VM. I've already created the self si
 
 Edit docker-compose and put the FQDN of the server in place of my.gitlab
 ```
-umask 022
 sudo systemctl stop fapolicyd
 sudo systemctl disable fapolicyd
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo dnf -y module enable container-tools
-sudo dnf -y install docker-ce --allowerasing
+sudo dnf -y install docker-ce git --allowerasing
 sudo systemctl start docker && sudo systemctl enable docker
 sudo usermod -aG docker $LOGNAME
 newgrp docker
