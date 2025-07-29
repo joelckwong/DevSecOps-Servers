@@ -15,6 +15,7 @@ services:
           registry_nginx['enable'] = true
           registry_nginx['ssl_certificate'] = "/etc/ssl/certs/gitlab/server-cert.pem"
           registry_nginx['ssl_certificate_key'] = "/etc/ssl/certs/gitlab/server-key.pem"
+          gitlab_rails['initial_root_password'] = 'secret_pass'
           gitlab_rails['backup_keep_time'] = 172800
       ports:
         - '4567:4567'

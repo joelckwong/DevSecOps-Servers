@@ -22,4 +22,4 @@ sudo firewall-cmd --reload
 sudo firewall-cmd --list-ports
 ```
 In the web browser go to https://FQDN
-login as admin/admin
+login as root/secret_pass
