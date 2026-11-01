@@ -23,12 +23,15 @@ services:
     container_name: jenkins
     volumes:
       - /data/jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: always
     logging:
       driver: json-file
       options:
         max-size: "100m"
         max-file: 3
+    ports:
+      - 8080:8080
 
   nginx:
     image: nginx:latest
